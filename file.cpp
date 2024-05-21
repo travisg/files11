@@ -166,7 +166,6 @@ int File::ReadVbn(const uint32_t vbn, Disk::Block *block) const {
 std::tuple<int, DirEntryList> File::ReadDirEntries() const {
     assert(is_dir());
 
-
     DirEntryList entries;
 
     // find the max number of blocks we'll want to read in
@@ -232,9 +231,7 @@ std::unique_ptr<File> File::OpenFileInDir(const std::string &name) const {
     (void)name;
 
     // get a list of our entries
-    int err;
-    DirEntryList entries;
-    std::tie(err, entries) = ReadDirEntries();
+    auto [err, entries] = ReadDirEntries();
     if (err < 0) {
         fprintf(stderr, "error reading MFD");
         return nullptr;

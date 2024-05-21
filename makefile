@@ -39,6 +39,7 @@ ASMFLAGS += $(COMPILEFLAGS)
 
 OBJS := \
 	main.o \
+	disk.o \
 	file.o \
 	filesystem.o \
 	utils.o

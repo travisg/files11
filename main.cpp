@@ -19,9 +19,7 @@ void dump_directory(auto dir) {
     if (!dir->is_dir())
         return;
 
-    int err;
-    ods2::DirEntryList list;
-    std::tie(err, list) = dir->ReadDirEntries();
+    auto [err, list] = dir->ReadDirEntries();
 
     printf("directory '%s'\n", dir->name().c_str());
     for (auto &e: list) {
@@ -32,9 +30,7 @@ void dump_directory(auto dir) {
 
 int recurse_directory(std::shared_ptr<ods2::File> dir, std::string leading_path, size_t level) {
 
-    int err;
-    ods2::DirEntryList list;
-    std::tie(err, list) = dir->ReadDirEntries();
+    auto [err, list] = dir->ReadDirEntries();
 
     for (auto &e: list) {
     
