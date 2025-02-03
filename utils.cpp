@@ -5,18 +5,18 @@
 // https://opensource.org/licenses/MIT
 #include "utils.h"
 
-#include <cstdio>
-#include <cctype>
 #include <algorithm>
+#include <cctype>
+#include <cstdio>
 
 void hexdump(const void *ptr, size_t len) {
     uintptr_t address = (uintptr_t)ptr;
     size_t count;
 
-    for (count = 0 ; count < len; count += 16) {
+    for (count = 0; count < len; count += 16) {
         union {
             uint32_t buf[4];
-            uint8_t  cbuf[16];
+            uint8_t cbuf[16];
         } u;
         size_t s = ROUNDUP(std::min(len - count, (size_t)16), 4);
         size_t i;
@@ -31,7 +31,7 @@ void hexdump(const void *ptr, size_t len) {
         }
         printf("|");
 
-        for (i=0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             char c = u.cbuf[i];
             if (i < s && isprint(c)) {
                 printf("%c", c);
@@ -48,14 +48,12 @@ void hexdump8_ex(const void *ptr, size_t len, uint64_t disp_addr) {
     uintptr_t address = (uintptr_t)ptr;
     size_t count;
     size_t i;
-    const char *addr_fmt = ((disp_addr + len) > 0xFFFFFFFF)
-                           ? "0x%016llx: "
-                           : "0x%08llx: ";
+    const char *addr_fmt = ((disp_addr + len) > 0xFFFFFFFF) ? "0x%016llx: " : "0x%08llx: ";
 
-    for (count = 0 ; count < len; count += 16) {
+    for (count = 0; count < len; count += 16) {
         printf(addr_fmt, disp_addr + count);
 
-        for (i=0; i < std::min(len - count, (size_t)16); i++) {
+        for (i = 0; i < std::min(len - count, (size_t)16); i++) {
             printf("%02hhx ", *(const uint8_t *)(address + i));
         }
 
@@ -65,7 +63,7 @@ void hexdump8_ex(const void *ptr, size_t len, uint64_t disp_addr) {
 
         printf("|");
 
-        for (i=0; i < std::min(len - count, (size_t)16); i++) {
+        for (i = 0; i < std::min(len - count, (size_t)16); i++) {
             char c = ((const char *)address)[i];
             printf("%c", isprint(c) ? c : '.');
         }
@@ -74,4 +72,3 @@ void hexdump8_ex(const void *ptr, size_t len, uint64_t disp_addr) {
         address += 16;
     }
 }
-

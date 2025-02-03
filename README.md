@@ -1,6 +1,6 @@
 # Files-11 ODS-2 Disk Image Parser
 
-A quick and dirty FILES-11 ODS-2 disk image parser. 
+A quick and dirty FILES-11 ODS-2 disk image parser.
 
 Currently opens and parses a disk image and walks the directory structure, but not much else.
 

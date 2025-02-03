@@ -9,8 +9,8 @@
 #include <cassert>
 #include <vector>
 
-#include "utils.h"
 #include "file.h"
+#include "utils.h"
 
 #define LOCAL_TRACE 0
 
@@ -73,7 +73,6 @@ int Filesystem::Mount(const std::string &diskfile) {
         return -1;
     }
     return 0;
-
 }
 
 } // namespace ods2

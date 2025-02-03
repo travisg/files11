@@ -3,37 +3,18 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT
-#include <array>
 #include <cstdio>
 #include <string>
 
-#include "disk.h"
 #include "filesystem.h"
-#include "ods2.h"
-#include "utils.h"
 
 // Test disk image in the root of the project
 const std::string diskfile = "ods2.disk";
 
-void dump_directory(auto dir) {
-    if (!dir->is_dir())
-        return;
-
-    auto [err, list] = dir->ReadDirEntries();
-
-    printf("directory '%s'\n", dir->name().c_str());
-    for (auto &e: list) {
-        printf("\t");
-        e.dump();
-    }
-}
-
 int recurse_directory(std::shared_ptr<ods2::File> dir, std::string leading_path, size_t level) {
-
     auto [err, list] = dir->ReadDirEntries();
 
-    for (auto &e: list) {
-    
+    for (auto &e : list) {
         std::shared_ptr<ods2::File> f = dir->OpenFileInDir(e.name);
         if (!f) {
             fprintf(stderr, "error opening file '%s'\n", e.name.c_str());

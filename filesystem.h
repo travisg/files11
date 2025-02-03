@@ -10,14 +10,14 @@
 #include <memory>
 #include <string>
 
-#include "ods2.h"
 #include "disk.h"
 #include "file.h"
+#include "ods2.h"
 
 namespace ods2 {
 
 class Filesystem {
-public:
+  public:
     Filesystem();
     ~Filesystem();
 
@@ -35,16 +35,12 @@ public:
         return mfd_file_;
     }
 
-    const Disk &disk() const {
-        return disk_;
-    }
+    const Disk &disk() const { return disk_; }
 
     uint8_t cluster_factor() const { return hblock_->cluster; }
-    uint32_t index_file_starting_vbn() const {
-        return hblock_->ibmapvbn - 1 + hblock_->ibmapsize;
-    }
+    uint32_t index_file_starting_vbn() const { return hblock_->ibmapvbn - 1 + hblock_->ibmapsize; }
 
-private:
+  private:
     DISALLOW_COPY_ASSIGN_AND_MOVE(Filesystem);
 
     bool mounted_ = false;
@@ -55,4 +51,4 @@ private:
     Disk disk_;
 };
 
-} // ods2
+} // namespace ods2

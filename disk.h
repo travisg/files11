@@ -4,13 +4,13 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT
 #pragma once
-#include <cstdio>
-#include <cstdint>
-#include <string>
 #include <array>
+#include <cstdint>
+#include <cstdio>
+#include <string>
 
 class Disk {
-public:
+  public:
     Disk();
     ~Disk();
 
@@ -27,7 +27,6 @@ public:
         return read(blocknum * 512, block->buf.data(), block->buf.size());
     }
 
-private:
+  private:
     FILE *fp = nullptr;
 };
-

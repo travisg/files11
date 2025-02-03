@@ -82,7 +82,8 @@ int File::ParseFileHeader(ods2::file_id id) {
 
     // Read in the map
     assert(extents_.size() == 0);
-    const uint16_t *map_area = (uint16_t *)(file_rec_block_.buf.data() + fhdr_->map_area_offset * 2);
+    const uint16_t *map_area =
+        (uint16_t *)(file_rec_block_.buf.data() + fhdr_->map_area_offset * 2);
 
     // walk the map list
     LTRACEF("parsing extent list:\n");
@@ -94,33 +95,33 @@ int File::ParseFileHeader(ods2::file_id id) {
         uint32_t block_count;
         const uint8_t format = (map_area[0] >> 14) & 0x3;
         switch (format) {
-            default:
-                // not actually possible, since it's a 2 bit field
-                assert(false);
-                continue;
-            case 0:
-                // TODO: handle
-                continue;
-            case 1:
-                block_count = map_area[0] & 0xff;
-                lbn = ((map_area[0] << 8) & 0x3f0000) | map_area[1];
-                break;
-            case 2:
-                block_count = map_area[0] & 0x3fff;
-                lbn = (map_area[2] << 16) | map_area[1];
-                break;
-            case 3:
-                block_count = (map_area[0] & 0x3fff) << 16;
-                block_count |= map_area[1];
-                lbn = (map_area[3] << 16) | map_area[2];
-                break;
+        default:
+            // not actually possible, since it's a 2 bit field
+            assert(false);
+            continue;
+        case 0:
+            // TODO: handle
+            continue;
+        case 1:
+            block_count = map_area[0] & 0xff;
+            lbn = ((map_area[0] << 8) & 0x3f0000) | map_area[1];
+            break;
+        case 2:
+            block_count = map_area[0] & 0x3fff;
+            lbn = (map_area[2] << 16) | map_area[1];
+            break;
+        case 3:
+            block_count = (map_area[0] & 0x3fff) << 16;
+            block_count |= map_area[1];
+            lbn = (map_area[3] << 16) | map_area[2];
+            break;
         }
         // previously read block count n + 1
         block_count++;
 
-        LTRACEF_NOFILE("\tformat %u: cluster %#x vbn %#x lbn %#x (offset %#x), count %#x\n",
-                format, vbn / fs_.cluster_factor(), vbn, lbn, lbn * 512, block_count);
-        extents_.push_back({ vbn, lbn, block_count });
+        LTRACEF_NOFILE("\tformat %u: cluster %#x vbn %#x lbn %#x (offset %#x), count %#x\n", format,
+                       vbn / fs_.cluster_factor(), vbn, lbn, lbn * 512, block_count);
+        extents_.push_back({vbn, lbn, block_count});
 
         assert((block_count % fs_.cluster_factor()) == 0);
 
@@ -146,7 +147,7 @@ int File::ReadVbn(const uint32_t vbn, Disk::Block *block) const {
 
     // translate vbn to lbn
     uint32_t lbn = UINT32_MAX;
-    for (const auto &extent: extents_) {
+    for (const auto &extent : extents_) {
         if (vbn >= extent.vbn && vbn < extent.vbn + extent.block_count) {
             // found it here
             lbn = extent.lbn + vbn - extent.vbn;
@@ -174,7 +175,7 @@ std::tuple<int, DirEntryList> File::ReadDirEntries() const {
         Disk::Block block;
         if (ReadVbn(vbn, &block) < 0) {
             fprintf(stderr, "readdir: failed to read vbn\n");
-            return { -1, {} };
+            return {-1, {}};
         }
 
         uintptr_t dir_pointer = (uintptr_t)block.buf.data();
@@ -194,12 +195,17 @@ std::tuple<int, DirEntryList> File::ReadDirEntries() const {
             LTRACEF_NOFILE("name '%s'\n", namebuf.data());
 
             // deal with the variable part
-            const auto num_dvfids = (dh->record_byte_count - sizeof(dir_header) - dh->name_byte_count + 2) / sizeof(ods2::dir_version_fid);
-            auto *dvfid = (const ods2::dir_version_fid *)(dir_pointer + sizeof(dir_header) + ROUNDUP(dh->name_byte_count, 2));
+            const auto num_dvfids =
+                (dh->record_byte_count - sizeof(dir_header) - dh->name_byte_count + 2) /
+                sizeof(ods2::dir_version_fid);
+            auto *dvfid = (const ods2::dir_version_fid *)(dir_pointer + sizeof(dir_header) +
+                                                          ROUNDUP(dh->name_byte_count, 2));
             for (uint32_t i = 0; i < num_dvfids; i++) {
-                LTRACEF_NOFILE("\tmax version %u, fid %s\n", dvfid->version, dvfid->id.id_str().c_str());
-                
-                entries.push_back({ std::string((const char *)namebuf.data()), dvfid->version, dvfid->id });
+                LTRACEF_NOFILE("\tmax version %u, fid %s\n", dvfid->version,
+                               dvfid->id.id_str().c_str());
+
+                entries.push_back(
+                    {std::string((const char *)namebuf.data()), dvfid->version, dvfid->id});
 
                 dvfid++;
             }
@@ -209,15 +215,15 @@ std::tuple<int, DirEntryList> File::ReadDirEntries() const {
         }
     }
 
-    return { 0, std::move(entries) };
+    return {0, std::move(entries)};
 }
 
 namespace {
 DirEntry *FindInDirEntryList(DirEntryList &list, const std::string &name) {
-    for (auto &e: list) {
+    for (auto &e : list) {
         // First match should be the highest version since they're sorted
         // highest version first in the directory.
-        //printf("comparing '%s' to '%s'\n", name.c_str(), e.name.c_str());
+        // printf("comparing '%s' to '%s'\n", name.c_str(), e.name.c_str());
         if (e.name == name) {
             return &e;
         }
@@ -225,7 +231,7 @@ DirEntry *FindInDirEntryList(DirEntryList &list, const std::string &name) {
 
     return nullptr;
 }
-}
+} // namespace
 
 std::unique_ptr<File> File::OpenFileInDir(const std::string &name) const {
     (void)name;
@@ -239,7 +245,7 @@ std::unique_ptr<File> File::OpenFileInDir(const std::string &name) const {
 
     // Dump the current directory
     if (LOCAL_TRACE) {
-        for (auto &e: entries) {
+        for (auto &e : entries) {
             printf("\t");
             e.dump();
         }
@@ -267,5 +273,4 @@ std::unique_ptr<File> File::OpenFileInDir(const std::string &name) const {
     return file;
 }
 
-
-} // ods2
+} // namespace ods2

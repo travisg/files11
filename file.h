@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 
-#include "ods2.h"
 #include "disk.h"
+#include "ods2.h"
 #include "utils.h"
 
 namespace ods2 {
@@ -32,7 +32,7 @@ struct DirEntry {
 using DirEntryList = std::vector<DirEntry>;
 
 class File {
-public:
+  public:
     explicit File(const Filesystem &fs);
     ~File();
 
@@ -45,7 +45,7 @@ public:
 
     std::unique_ptr<File> OpenFileInDir(const std::string &name) const;
 
-    ods2::file_id id() const { 
+    ods2::file_id id() const {
         assert(opened_);
         return *id_;
     }
@@ -58,7 +58,7 @@ public:
 
     std::tuple<int, DirEntryList> ReadDirEntries() const;
 
-private:
+  private:
     struct extent {
         uint32_t vbn;
         uint32_t lbn;
@@ -70,15 +70,28 @@ private:
     const Filesystem &fs_;
     bool opened_ = false;
 
-    Disk::Block file_rec_block_ {}; // a copy of the primary file record block
+    Disk::Block file_rec_block_{}; // a copy of the primary file record block
 
     // Pointers into the file record block above
-    const ods2::file_header *fhdr_ {};
-    const ods2::file_ident *fident_ {};
-    const ods2::file_id *id_ {};
+    const ods2::file_header *fhdr_{};
+    const ods2::file_ident *fident_{};
+    const ods2::file_id *id_{};
 
     // list of all the extents of the file
     std::vector<extent> extents_{};
 };
 
-} // ods2
+inline void dump_directory(std::shared_ptr<ods2::File> dir) {
+    if (!dir->is_dir())
+        return;
+
+    auto [err, list] = dir->ReadDirEntries();
+
+    printf("directory '%s'\n", dir->name().c_str());
+    for (auto &e : list) {
+        printf("\t");
+        e.dump();
+    }
+}
+
+} // namespace ods2
