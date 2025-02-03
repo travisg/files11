@@ -5,6 +5,7 @@
 // https://opensource.org/licenses/MIT
 #pragma once
 #include <cstdio>
+#include <cstdint>
 #include <string>
 #include <array>
 
